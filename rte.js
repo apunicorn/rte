@@ -119,7 +119,7 @@ $(function() {
         var letters = [],
             cursor,
             idNum = 0;
-
+        $('#editor').empty();
         function cursorBlink() {
             $('#cursor').animate({
                 opacity: 0
@@ -142,7 +142,6 @@ $(function() {
         if(contents.length > 0){
             $('#cursor').remove();
             show();
-            contents = [];
         } else {
             $('#editor').click(function(){
                 if ($('#cursor')) {
