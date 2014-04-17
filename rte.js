@@ -1,27 +1,23 @@
 $(function() {
 
-    var contents = [];
+    var contents = [],
+    highlighted = [],
+    red;
 
-        $('#editor').keydown(function(ev){
-            if(ev.keyCode == '8'){
-              contents.pop(); 
-              render(); 
-          };
-      });
-        $('#editor').keypress(function(ev){
-            if(ev.keyCode == '13'){
-                contents.push({
-                    type: 'endline'
-                });
-            } else {
-                contents.push({
-                    type: 'character',
-                    value: String.fromCharCode(ev.keyCode),
-                    format: {bold:false, italic:false}
-                });
-            };
-            render();
-        });
+    $('#editor').keypress(function(ev){
+        if(ev.keyCode == '13'){
+            contents.push({
+                type: 'endline'
+            });
+        } else {
+            contents.push({
+                type: 'character',
+                value: String.fromCharCode(ev.keyCode),
+                format: {bold:false, italic:false}
+            });
+        };
+        render();
+    });
 
     function render() {
         var letters = [],
@@ -50,7 +46,7 @@ $(function() {
         if(contents.length > 0){
             $('#cursor').remove();
             show();
-        } else {
+         } else {
                 $('#editor').click(function(){
                     if ($('#cursor')) {
                         $('#cursor').remove();
@@ -67,6 +63,13 @@ $(function() {
                     }, 300);
                 });
         }
+
+  //         $('#editor').keydown(function(ev){
+  //       if(ev.keyCode == '8'){
+  //         contents.pop(); 
+  //         render(); 
+  //     };
+  // });
 
         function show(){
             $.each(contents, function () {
@@ -131,13 +134,34 @@ $(function() {
                                 } else {
                                    var redId = selectionStart + ww;     
                                 }
-                               var red = $('#'+ redId);
+                               red = $('#'+ redId);
                                red.css('background-color', 'red'); 
+                               highlighted.push(red.selector.substring(1));
                             };
                             
+                            selectedAlter();
+                            
                             letterSpans.off('mousemove');
+                            highlighted = [];
                         });
                     });
+
+                    function selectedAlter(){
+                        var newHi = highlighted,
+                        newCon = contents;
+                        $('#editor').off('keydown').keydown(function(ev){
+                            for(var vv=0; vv<newHi.length; vv++){
+                                if(ev.keyCode == '8'){
+                                  var toRemove = newCon[newHi[vv]-1]
+                                  var indexRemove = contents.indexOf(toRemove);
+                                  console.log(toRemove);
+                                  contents.splice(indexRemove, 1); 
+                                }
+                          };
+                          render();
+                      });
+                    };
+
                     letterSpans.off('mouseup').mouseup(function () {
                         letterSpans.css('background-color' , 'transparent');
                         cursor = $('<span>|</span>');
