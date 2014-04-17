@@ -2,6 +2,27 @@ $(function() {
 
     var contents = [];
 
+        $('#editor').keydown(function(ev){
+            if(ev.keyCode == '8'){
+              contents.pop(); 
+              render(); 
+          };
+      });
+        $('#editor').keypress(function(ev){
+            if(ev.keyCode == '13'){
+                contents.push({
+                    type: 'endline'
+                });
+            } else {
+                contents.push({
+                    type: 'character',
+                    value: String.fromCharCode(ev.keyCode),
+                    format: {bold:false, italic:false}
+                });
+            };
+            render();
+        });
+
     function render() {
         var letters = [],
             cursor,
@@ -30,31 +51,21 @@ $(function() {
             $('#cursor').remove();
             show();
         } else {
-            $('#editor').click(function(){
-                if ($('#cursor')) {
-                    $('#cursor').remove();
-                }
-                cursor = $('<span>|</span>');
-                cursor.attr('id', 'cursor');
-                cursor.css({
-                    'color': 'red',
-                    'font-weight': 'bold'
-                   });
-                $('#editor').append(cursor);
-                setInterval(function () {
-                    cursorBlink()
-                }, 300);
-            });
-            if($('#cursor')){
-                $('#editor').keypress(function(ev){
-                    contents.push({
-                        type: 'character',
-                        value: String.fromCharCode(ev.keyCode),
-                        format: {bold:false, italic:false}
-                    });
-                    render();
+                $('#editor').click(function(){
+                    if ($('#cursor')) {
+                        $('#cursor').remove();
+                    }
+                    cursor = $('<span>|</span>');
+                    cursor.attr('id', 'cursor');
+                    cursor.css({
+                        'color': 'red',
+                        'font-weight': 'bold'
+                       });
+                    $('#editor').append(cursor);
+                    setInterval(function () {
+                        cursorBlink()
+                    }, 300);
                 });
-            }
         }
 
         function show(){
