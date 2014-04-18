@@ -139,22 +139,18 @@ $(function() {
                                highlighted.push(red.selector.substring(1));
                             };
                             
-                            selectedAlter();
+                            selectedAlter(highlighted);
                             
                             letterSpans.off('mousemove');
                             highlighted = [];
                         });
                     });
 
-                    function selectedAlter(){
-                        var newHi = highlighted,
-                        newCon = contents;
+                    function selectedAlter(newHi){
                         $('#editor').off('keydown').keydown(function(ev){
                             for(var vv=0; vv<newHi.length; vv++){
                                 if(ev.keyCode == '8'){
-                                  var toRemove = newCon[newHi[vv]-1]
-                                  var indexRemove = contents.indexOf(toRemove);
-                                  console.log(toRemove);
+                                  var indexRemove = newHi[vv]-1;
                                   contents.splice(indexRemove, 1); 
                                 }
                           };
