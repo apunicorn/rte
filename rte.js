@@ -2,6 +2,7 @@ $(function() {
 
     var contents = [],
     highlighted = [],
+    cursorThere = false,
     red;
 
     $('#editor').keypress(function(ev){
@@ -24,6 +25,8 @@ $(function() {
             cursor,
             idNum = 0;
         $('#editor').empty();
+        cursorThere = false;
+        showCursor();
         function cursorBlink() {
             $('#cursor').animate({
                 opacity: 0
@@ -32,9 +35,26 @@ $(function() {
             }, 300);
         };
 
+        function showCursor() {
+                cursor = $('<span>|</span>');
+                cursor.attr('id', 'cursor');
+                cursor.css({
+                    'color': 'red',
+                    'font-weight': 'bold'
+                   });
+                if(!cursorThere){
+                    $('#editor').append(cursor);
+                    setInterval(function () {
+                        cursorBlink()
+                    }, 300);
+                    cursorThere = true;
+                } 
+        };
+
         $('html').click(function () {
             if ($('#cursor')) {
                 $('#cursor').remove();
+                cursorThere = false;
             }
             $('#editor').children().css('background-color' , 'transparent');
             $('#editor').children().off('mousemove');
@@ -44,32 +64,19 @@ $(function() {
             e.stopPropagation();
         }); 
         if(contents.length > 0){
-            $('#cursor').remove();
             show();
-         } else {
+        } else {
                 $('#editor').click(function(){
-                    if ($('#cursor')) {
-                        $('#cursor').remove();
-                    }
-                    cursor = $('<span>|</span>');
-                    cursor.attr('id', 'cursor');
-                    cursor.css({
-                        'color': 'red',
-                        'font-weight': 'bold'
-                       });
-                    $('#editor').append(cursor);
-                    setInterval(function () {
-                        cursorBlink()
-                    }, 300);
+                    showCursor();
                 });
         }
 
-  //         $('#editor').keydown(function(ev){
-  //       if(ev.keyCode == '8'){
-  //         contents.pop(); 
-  //         render(); 
-  //     };
-  // });
+          // $('#editor').keydown(function(ev){
+          //   if(ev.keyCode == '8'){
+          //     contents.pop(); 
+          //     render(); 
+          // };
+  //});
 
         function show(){
             $.each(contents, function () {
@@ -81,34 +88,32 @@ $(function() {
                     var format = content.format,
                         bolded = format.bold,
                         italicized = format.italic;
+                        newSpan.attr('id' , idNum);
                     if (bolded && italicized) {
-                        newSpan.attr('id' , idNum);
                         newSpan.html('<b><i>' + contentVal + '</i></b>');
-                        $("#editor").append(newSpan);
+                        $('#cursor').before(newSpan);
                     } else if (bolded) {
-                        newSpan.attr('id' , idNum);
                         newSpan.html('<b>' + contentVal + '</b>');
-                        $("#editor").append(newSpan);
+                        $('#cursor').before(newSpan);
                     } else if (italicized) {
-                       newSpan.attr('id' , idNum);
                         newSpan.html('<i>' + contentVal + '</i>');
-                        $("#editor").append(newSpan);
+                        $('#cursor').before(newSpan);
                     } else {
-                            newSpan.attr('id' , idNum);
-                            newSpan.html(contentVal);
-                            $("#editor").append(newSpan);
-                           }
+                        newSpan.html(contentVal);
+                            $('#cursor').before(newSpan);
+                        }
                 } else {
                     newSpan.attr('id' , idNum + '_break');
                     newSpan.html(' <br> ');
-                    $("#editor").append(newSpan);
+                    $('#cursor').before(newSpan);
                 }
             });
         
-            var lastSpan = $('<span></span>');
-            lastSpan.attr('id' , contents.length + 1 + '_last');
-            lastSpan.html('&nbsp;');
-            $("#editor").append(lastSpan);
+            // var lastSpan = $('<span></span>');
+            // lastSpan.attr('id' , contents.length + 1 + '_last');
+            // lastSpan.html('&nbsp;');
+            // $('#cursor').after(lastSpan);
+
            
             var letterSpans = $('#editor').children();
             letterSpans.each(function () {
@@ -117,9 +122,9 @@ $(function() {
                     selectionEnd,
                     difference;
                 letterSpan.mousedown(function () {
-                    if ($('#cursor')) {
-                        $('#cursor').remove();
-                    }
+                    // if ($('#cursor')) {
+                    //     $('#cursor').remove();
+                    // }
                     letterSpans.css('background-color' , 'transparent');
                     letterSpans.off('mousemove');
                     selectionStart = parseInt($(this).attr('id'));
@@ -147,30 +152,53 @@ $(function() {
                     });
 
                     function selectedAlter(newHi){
+                        //17: control, 66: b, 73: i, 82: r, 72:  h
+                        var pressedStuff = {17: false, 66: false, 73: false, 82: false, 72: false};
                         $('#editor').off('keydown').keydown(function(ev){
                             for(var vv=0; vv<newHi.length; vv++){
                                 if(ev.keyCode == '8'){
                                   var indexRemove = newHi[vv]-1;
                                   contents.splice(indexRemove, 1); 
+                                } else if(ev.keyCode in pressedStuff){
+                                    pressedStuff[ev.keyCode] =true;
+                                    if(pressedStuff[17] && pressedStuff[66]) {
+                                        console.log('both');
+                                    }
                                 }
                           };
                           render();
                       });
                     };
-
-                    letterSpans.off('mouseup').mouseup(function () {
-                        letterSpans.css('background-color' , 'transparent');
-                        cursor = $('<span>|</span>');
-                        cursor.attr('id', 'cursor');
-                        cursor.css({
-                            'color': 'red',
-                            'font-weight': 'bold'
+                        letterSpans.off('mouseup').mouseup(function () {
+                            if ($('#cursor')) {
+                                $('#cursor').remove();
+                            }
+                            if ($('#cursor2')) {
+                                $('#cursor2').remove();
+                            }
+                            letterSpans.css('background-color' , 'transparent');
+                            cursor2 = $('<span>|</span>');
+                            cursor2.attr('id', 'cursor2');
+                            cursor2.css({
+                                'color': 'red',
+                                'font-weight': 'bold'
+                            });
+                            letterSpan.before(cursor2);
+                            setInterval(function () {
+                                cursorBlink()
+                            }, 300);
+                            $('#editor').off('keydown').keydown(function(ev){
+                                var willRemove = Array.prototype.indexOf.call($("#editor").children(), $("#cursor2")[0]);
+                                if(ev.keyCode == '8'){
+                                    console.log(contents[willRemove-1]);
+                                    var indexToAdd = letterSpans[willRemove-2];
+                                    contents.splice(willRemove-1, 1);
+                                    render();
+                                    console.log(indexToAdd);
+                                    indexToAdd.before(cursor2); 
+                              };
+                          });
                         });
-                        letterSpan.before(cursor);
-                        setInterval(function () {
-                            cursorBlink()
-                        }, 300);
-                    });
                 });
             });
         };
