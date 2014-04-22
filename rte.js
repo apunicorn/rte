@@ -124,7 +124,7 @@ $(function() {
             
             var lastSpan = $('<span></span>');
                 lastSpan.attr('id' , contents.length + 1 + '_last');
-                lastSpan.html('&nbsp;&nbsp;&nbsp;&nbsp;');
+                lastSpan.html('&nbsp;');
                 $("#editor").append(lastSpan);
 
             var letterSpans = $('#editor').children();
@@ -189,35 +189,37 @@ $(function() {
                       });
                     };
                         letterSpans.off('mouseup').mouseup(function () {
-                            if ($('#cursor')) {
-                                $('#cursor').remove();
-                            }
-                            if ($('#cursor2')) {
-                                $('#cursor2').remove();
-                            }
-                            letterSpans.css('background-color' , 'transparent');
-                            cursor2 = $('<span>|</span>');
-                            cursor2.attr('id', 'cursor2');
-                            cursor2.css({
-                                'color': 'red',
-                                'font-weight': 'bold'
-                            });
-                            letterSpan.before(cursor2);
-                            cursor2there = true;
-                            setInterval(function () {
-                                cursorBlink($('#cursor2'))
-                            }, 300);
-                            $('#editor').off('keydown').keydown(function(ev){
-                                var willRemove = Array.prototype.indexOf.call($("#editor").children(), $("#cursor2")[0]);
-                                if(ev.keyCode == '8'){
-                                    var indexToAdd = letterSpans[willRemove-2];
-                                    contents.splice(willRemove-1, 1);
-                                    render();
-                              } else {
+                             if ($('#cursor')) {
+                                 $('#cursor').remove();
+                             }
+                             if ($('#cursor2')) {
+                                 $('#cursor2').remove();
+                             }
+                             letterSpans.css('background-color' , 'transparent');
+                             cursor2 = $('<span>|</span>');
+                             cursor2.attr('id', 'cursor2');
+                             cursor2.css({
+                                 'color': 'red',
+                                 'font-weight': 'bold'
+                             });
+                             letterSpan.before(cursor2);
+                             setInterval(function () {
+                                 cursorBlink($('#cursor2'))
+                             }, 300);
+                             $('#editor').off('keydown').keydown(function(ev){
+                                 var willRemove = Array.prototype.indexOf.call($("#editor").children(), $("#cursor2")[0]);
+                                 if(ev.keyCode == '8'){
+                                     console.log(contents[willRemove-1]);
+                                     var indexToAdd = letterSpans[willRemove-2];
+                                     contents.splice(willRemove-1, 1);
+                                     render();
+                                     console.log(indexToAdd);
+                                   indexToAdd.before(cursor2); 
+                           } else {
                                     //need to buildUp() and show() and render()...
                               }
+                         });
                           });
-                        });
                 });
             });
         };
