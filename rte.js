@@ -118,9 +118,15 @@ $(function() {
                     newSpan.html(' <br> ');
                     $('#cursor').before(newSpan);
                 }
-            });
 
-           
+            });
+    
+            
+            var lastSpan = $('<span></span>');
+                lastSpan.attr('id' , contents.length + 1 + '_last');
+                lastSpan.html('&nbsp;&nbsp;&nbsp;&nbsp;');
+                $("#editor").append(lastSpan);
+
             var letterSpans = $('#editor').children();
             letterSpans.each(function () {
                 var letterSpan = $(this),
@@ -128,6 +134,16 @@ $(function() {
                     selectionEnd,
                     difference;
                 letterSpan.mousedown(function () {
+                    //this doesnt actually work:
+                    if ($('#cursor')) {
+                        $('#cursor').remove();
+                        cursorThere = false;
+                    }
+                    //this does though:
+                    if ($('#cursor2')) {
+                        $('#cursor2').remove();
+                        cursor2there = false;
+                    }
                     letterSpans.css('background-color' , 'transparent');
                     letterSpans.off('mousemove');
                     selectionStart = parseInt($(this).attr('id'));
