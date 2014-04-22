@@ -3,22 +3,29 @@ $(function() {
     var contents = [],
     highlighted = [],
     cursorThere = false,
+    cursor2there = false,
     red;
 
+    //adds characters and line breaks to the contents array
+
     $('#editor').keypress(function(ev){
-        if(ev.keyCode == '13'){
+        buildUp(ev);
+    });
+
+    function buildUp(e) {
+        if(e.keyCode == '13'){
             contents.push({
                 type: 'endline'
             });
         } else {
             contents.push({
                 type: 'character',
-                value: String.fromCharCode(ev.keyCode),
+                value: String.fromCharCode(e.keyCode),
                 format: {bold:false, italic:false}
             });
         };
         render();
-    });
+    };
 
     function render() {
         var letters = [],
@@ -27,8 +34,8 @@ $(function() {
         $('#editor').empty();
         cursorThere = false;
         showCursor();
-        function cursorBlink() {
-            $('#cursor').animate({
+        function cursorBlink(type) {
+            type.animate({
                 opacity: 0
             }, 300).animate({
                 opacity: 1
@@ -42,19 +49,23 @@ $(function() {
                     'color': 'red',
                     'font-weight': 'bold'
                    });
-                if(!cursorThere){
+                if(!cursorThere && !cursor2there){
                     $('#editor').append(cursor);
                     setInterval(function () {
-                        cursorBlink()
+                        cursorBlink($('#cursor'));
                     }, 300);
                     cursorThere = true;
                 } 
         };
-
+        //if you click outside the editor div, the cursor(s) and highlighting disappears
         $('html').click(function () {
             if ($('#cursor')) {
                 $('#cursor').remove();
                 cursorThere = false;
+            }
+            if ($('#cursor2')) {
+                $('#cursor2').remove();
+                cursor2there = false;
             }
             $('#editor').children().css('background-color' , 'transparent');
             $('#editor').children().off('mousemove');
@@ -66,17 +77,17 @@ $(function() {
         if(contents.length > 0){
             show();
         } else {
-                $('#editor').click(function(){
-                    showCursor();
-                });
+            $('#editor').click(function(){
+                showCursor();
+            });
         }
-
-          // $('#editor').keydown(function(ev){
-          //   if(ev.keyCode == '8'){
-          //     contents.pop(); 
-          //     render(); 
-          // };
-  //});
+        //backspace button removes last letter when cursor at end of text
+        $('#editor').off('keydown').keydown(function(ev){
+            if(ev.keyCode == '8'){
+                contents.pop(); 
+                render(); 
+          };
+  });
 
         function show(){
             $.each(contents, function () {
@@ -108,11 +119,6 @@ $(function() {
                     $('#cursor').before(newSpan);
                 }
             });
-        
-            // var lastSpan = $('<span></span>');
-            // lastSpan.attr('id' , contents.length + 1 + '_last');
-            // lastSpan.html('&nbsp;');
-            // $('#cursor').after(lastSpan);
 
            
             var letterSpans = $('#editor').children();
@@ -122,9 +128,6 @@ $(function() {
                     selectionEnd,
                     difference;
                 letterSpan.mousedown(function () {
-                    // if ($('#cursor')) {
-                    //     $('#cursor').remove();
-                    // }
                     letterSpans.css('background-color' , 'transparent');
                     letterSpans.off('mousemove');
                     selectionStart = parseInt($(this).attr('id'));
@@ -184,19 +187,19 @@ $(function() {
                                 'font-weight': 'bold'
                             });
                             letterSpan.before(cursor2);
+                            cursor2there = true;
                             setInterval(function () {
-                                cursorBlink()
+                                cursorBlink($('#cursor2'))
                             }, 300);
                             $('#editor').off('keydown').keydown(function(ev){
                                 var willRemove = Array.prototype.indexOf.call($("#editor").children(), $("#cursor2")[0]);
                                 if(ev.keyCode == '8'){
-                                    console.log(contents[willRemove-1]);
                                     var indexToAdd = letterSpans[willRemove-2];
                                     contents.splice(willRemove-1, 1);
                                     render();
-                                    console.log(indexToAdd);
-                                    indexToAdd.before(cursor2); 
-                              };
+                              } else {
+                                    //need to buildUp() and show() and render()...
+                              }
                           });
                         });
                 });
