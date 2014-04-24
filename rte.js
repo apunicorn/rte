@@ -1,9 +1,6 @@
 $(function() {
 
     var contents = [],
-    highlighted = [],
-    cursorThere = false,
-    cursor2there = false,
     red;
 
     //adds characters and line breaks to the contents array
@@ -25,50 +22,54 @@ $(function() {
             });
         };
         render();
-    };
+    }
+
+    function cursorThere() {
+      return $("#cursor").length;
+    }
+
+    function cursor2There() {
+      return $("#cursor2").length;
+    }
+
+    function cursorBlink(type) {
+      type.animate({
+        opacity: 0
+      }, 300).animate({
+        opacity: 1
+      }, 300);
+    }
+
+    function showCursor() {
+      var cursor = $('<span>|</span>');
+      cursor.attr('id', 'cursor');
+      cursor.css({
+        'color': 'red',
+        'font-weight': 'bold'
+      });
+      if(!cursorThere()){
+        $('#editor').append(cursor);
+        setInterval(function () {
+          cursorBlink($('#cursor'));
+        }, 300);
+      }
+      return cursor;
+    }
+
 
     function render() {
         var letters = [],
-            cursor,
-            idNum = 0;
+                    idNum = 0;
         $('#editor').empty();
-        cursorThere = false;
-        showCursor();
-        function cursorBlink(type) {
-            type.animate({
-                opacity: 0
-            }, 300).animate({
-                opacity: 1
-            }, 300);
-        };
+        var cursor = showCursor();
 
-        function showCursor() {
-                cursor = $('<span>|</span>');
-                cursor.attr('id', 'cursor');
-                cursor.css({
-                    'color': 'red',
-                    'font-weight': 'bold'
-                   });
-                if(!cursorThere && !cursor2there){
-                    $('#editor').append(cursor);
-                    setInterval(function () {
-                        cursorBlink($('#cursor'));
-                    }, 300);
-                    cursorThere = true;
-                } 
-        };
+
         //if you click outside the editor div, the cursor(s) and highlighting disappears
         $('html').click(function () {
-            if ($('#cursor')) {
-                $('#cursor').remove();
-                cursorThere = false;
-            }
-            if ($('#cursor2')) {
-                $('#cursor2').remove();
-                cursor2there = false;
-            }
-            $('#editor').children().css('background-color' , 'transparent');
-            $('#editor').children().off('mousemove');
+          $('#cursor').remove();
+          $('#cursor2').remove();
+          $('#editor').children().css('background-color' , 'transparent');
+          $('#editor').children().off('mousemove');
         });
 
         $('#editor').click(function (e) {
@@ -77,79 +78,89 @@ $(function() {
         if(contents.length > 0){
             show();
         } else {
-            $('#editor').click(function(){
-                showCursor();
-            });
+            //$('#editor').click(function(){
+            //    showCursor();
+            //});
         }
         //backspace button removes last letter when cursor at end of text
         $('#editor').off('keydown').keydown(function(ev){
             if(ev.keyCode == '8'){
                 contents.pop(); 
                 render(); 
-          };
-  });
+            };
+        });
 
-        function show(){
-            $.each(contents, function () {
-                var content = this,
-                    contentVal = content.value;
-                    idNum++;
-                    var newSpan = $('<span></span>');
-                if (content.type == 'character') {
-                    var format = content.format,
-                        bolded = format.bold,
-                        italicized = format.italic;
-                        newSpan.attr('id' , idNum);
-                    if (bolded && italicized) {
-                        newSpan.html('<b><i>' + contentVal + '</i></b>');
-                        $('#cursor').before(newSpan);
-                    } else if (bolded) {
-                        newSpan.html('<b>' + contentVal + '</b>');
-                        $('#cursor').before(newSpan);
-                    } else if (italicized) {
-                        newSpan.html('<i>' + contentVal + '</i>');
-                        $('#cursor').before(newSpan);
-                    } else {
-                        newSpan.html(contentVal);
-                            $('#cursor').before(newSpan);
-                        }
-                } else {
-                    newSpan.attr('id' , idNum + '_break');
-                    newSpan.html(' <br> ');
-                    $('#cursor').before(newSpan);
-                }
+        
+    };
 
-            });
-    
-            
-            var lastSpan = $('<span></span>');
-                lastSpan.attr('id' , contents.length + 1 + '_last');
-                lastSpan.html('&nbsp;');
-                $("#editor").append(lastSpan);
+    function showContentElement(index) {
+      var content = this,
+      contentVal = content.value;
+      var idNum = index+1;
+      var newSpan = $('<span></span>');
+      if (content.type == 'character') {
+        var format = content.format,
+        bolded = format.bold,
+        italicized = format.italic;
+        newSpan.attr('id' , idNum);
+        if (bolded && italicized) {
+          newSpan.html('<b><i>' + contentVal + '</i></b>');
+          $('#cursor').before(newSpan);
+        } else if (bolded) {
+          newSpan.html('<b>' + contentVal + '</b>');
+          $('#cursor').before(newSpan);
+        } else if (italicized) {
+          newSpan.html('<i>' + contentVal + '</i>');
+          $('#cursor').before(newSpan);
+        } else {
+          newSpan.html(contentVal);
+          $('#cursor').before(newSpan);
+        }
+      } else {
+        newSpan.attr('id' , idNum + '_break');
+        newSpan.html(' <br> ');
+        $('#cursor').before(newSpan);
+      }
 
-            var letterSpans = $('#editor').children();
-            letterSpans.each(function () {
-                var letterSpan = $(this),
-                    selectionStart,
-                    selectionEnd,
-                    difference;
+    }
+
+    function addLastSpan() {
+
+      var lastSpan = $('<span></span>');
+      lastSpan.attr('id' , contents.length + 1 + '_last');
+      lastSpan.html('&nbsp;');
+      $("#editor").append(lastSpan);
+      return lastSpan;
+    }
+
+    function show(){
+      $.each(contents, showContentElement);
+      
+      var lastSpan = addLastSpan();
+
+      var letterSpans = $('#editor').children();
+      letterSpans.each(function () {
+        var letterSpan = $(this),
+            selectionStart,
+            selectionEnd,
+            difference;
                 letterSpan.mousedown(function () {
                     //this doesnt actually work:
-                    if ($('#cursor')) {
+                    if (cursorThere()) {
                         $('#cursor').remove();
-                        cursorThere = false;
                     }
                     //this does though:
-                    if ($('#cursor2')) {
+                    if (cursor2There()) {
                         $('#cursor2').remove();
-                        cursor2there = false;
                     }
                     letterSpans.css('background-color' , 'transparent');
                     letterSpans.off('mousemove');
                     selectionStart = parseInt($(this).attr('id'));
                     letterSpans.off('mousemove').mousemove(function (ev) {
+
                         letterSpans.off('mouseup').mouseup(function () {
-                        selectionEnd = parseInt($(this).attr('id'));
+                          var highlighted = [];
+                            selectionEnd = parseInt($(this).attr('id'));
                             difference = selectionStart - selectionEnd;
                             for(var ww = 0; ww < Math.abs(difference); ww++){
                                var spans = $('span');
@@ -161,12 +172,11 @@ $(function() {
                                red = $('#'+ redId);
                                red.css('background-color', 'red'); 
                                highlighted.push(red.selector.substring(1));
-                            };
+                            }
                             
                             selectedAlter(highlighted);
                             
                             letterSpans.off('mousemove');
-                            highlighted = [];
                         });
                     });
 
@@ -187,12 +197,12 @@ $(function() {
                           };
                           render();
                       });
-                    };
+                    }
                         letterSpans.off('mouseup').mouseup(function () {
-                             if ($('#cursor')) {
+                             if (cursorThere()) {
                                  $('#cursor').remove();
                              }
-                             if ($('#cursor2')) {
+                             if (cursor2There()) {
                                  $('#cursor2').remove();
                              }
                              letterSpans.css('background-color' , 'transparent');
@@ -209,11 +219,10 @@ $(function() {
                              $('#editor').off('keydown').keydown(function(ev){
                                  var willRemove = Array.prototype.indexOf.call($("#editor").children(), $("#cursor2")[0]);
                                  if(ev.keyCode == '8'){
-                                     console.log(contents[willRemove-1]);
                                      var indexToAdd = letterSpans[willRemove-2];
                                      contents.splice(willRemove-1, 1);
                                      render();
-                                     console.log(indexToAdd);
+                                     //need to make a var with the place that the cursor is at so i can reference that and keep it there
                                    indexToAdd.before(cursor2); 
                            } else {
                                     //need to buildUp() and show() and render()...
@@ -223,7 +232,6 @@ $(function() {
                 });
             });
         };
-    };
 
     render();
  });
