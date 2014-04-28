@@ -1,6 +1,7 @@
 $(function() {
 
     var contents = [],
+    cursorPos,
     red;
 
     //adds characters and line breaks to the contents array
@@ -21,7 +22,7 @@ $(function() {
                 format: {bold:false, italic:false}
             });
         };
-        render();
+        render('end');
     }
 
     function cursorThere() {
@@ -40,29 +41,39 @@ $(function() {
       }, 300);
     }
 
-    function showCursor() {
+    function showCursor(arg) {
       var cursor = $('<span>|</span>');
       cursor.attr('id', 'cursor');
       cursor.css({
         'color': 'red',
         'font-weight': 'bold'
       });
-      if(!cursorThere()){
-        $('#editor').append(cursor);
-        setInterval(function () {
-          cursorBlink($('#cursor'));
-        }, 300);
+      if(arg == 'end'){
+        if(!cursorThere()){
+          $('#editor').append(cursor);
+          setInterval(function () {
+            cursorBlink($('#cursor'));
+          }, 300);
+        }
+      } else {
+        console.log(arg);
+        var editorKids = $('#editor').children();
+        //letterSpan.before(cursor2);
+        console.log(editorKids[arg-1]);
       }
       return cursor;
     }
 
 
-    function render() {
+    function render(where) {
         var letters = [],
-                    idNum = 0;
-        $('#editor').empty();
-        var cursor = showCursor();
-
+          idNum = 0;
+          if(isNaN(where)){
+            $('#editor').empty();
+            var cursor = showCursor('end');
+          } else {
+            var cursor = showCursor(where);
+          }
 
         //if you click outside the editor div, the cursor(s) and highlighting disappears
         $('html').click(function () {
@@ -86,7 +97,7 @@ $(function() {
         $('#editor').off('keydown').keydown(function(ev){
             if(ev.keyCode == '8'){
                 contents.pop(); 
-                render(); 
+                render('end'); 
             };
         });
 
@@ -195,7 +206,7 @@ $(function() {
                                     }
                                 }
                           };
-                          render();
+                          render('end');
                       });
                     }
                         letterSpans.off('mouseup').mouseup(function () {
@@ -213,6 +224,7 @@ $(function() {
                                  'font-weight': 'bold'
                              });
                              letterSpan.before(cursor2);
+                             cursorPos = letterSpan[0].id;
                              setInterval(function () {
                                  cursorBlink($('#cursor2'))
                              }, 300);
@@ -221,9 +233,9 @@ $(function() {
                                  if(ev.keyCode == '8'){
                                      var indexToAdd = letterSpans[willRemove-2];
                                      contents.splice(willRemove-1, 1);
-                                     render();
+                                     cursorPos--;
+                                     render(cursorPos);
                                      //need to make a var with the place that the cursor is at so i can reference that and keep it there
-                                   indexToAdd.before(cursor2); 
                            } else {
                                     //need to buildUp() and show() and render()...
                               }
@@ -233,8 +245,5 @@ $(function() {
             });
         };
 
-    render();
+    render('end');
  });
-
-
-
