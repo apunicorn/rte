@@ -48,20 +48,27 @@ $(function() {
         'color': 'red',
         'font-weight': 'bold'
       });
+      var cursor2 = $('<span>|</span>');
+      cursor2.attr('id', 'cursor');
+      cursor2.css({
+        'color': 'red',
+        'font-weight': 'bold'
+      });
       if(arg == 'end'){
         if(!cursorThere()){
           $('#editor').append(cursor);
           setInterval(function () {
             cursorBlink($('#cursor'));
           }, 300);
+          return cursor;
         }
       } else {
-        console.log(arg);
-        var editorKids = $('#editor').children();
-        //letterSpan.before(cursor2);
-        console.log(editorKids[arg-1]);
+        var editorKids = $('#editor').children(), 
+        whereToPlace = editorKids[arg-1];
+        console.log(whereToPlace)
+        whereToPlace.before(cursor2);
+        return cursor2;
       }
-      return cursor;
     }
 
 
