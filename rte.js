@@ -65,8 +65,9 @@ $(function() {
       } else {
         var editorKids = $('#editor').children(), 
         whereToPlace = editorKids[arg-1];
-        console.log(whereToPlace)
-        whereToPlace.before(cursor2);
+        console.log(whereToPlace);
+        //remember to wrap whereToPlace in $() since you're using it!!!!
+        $(whereToPlace).before(cursor2);
         return cursor2;
       }
     }
@@ -75,12 +76,8 @@ $(function() {
     function render(where) {
         var letters = [],
           idNum = 0;
-          if(isNaN(where)){
-            $('#editor').empty();
+        $('#editor').empty();
             var cursor = showCursor('end');
-          } else {
-            var cursor = showCursor(where);
-          }
 
         //if you click outside the editor div, the cursor(s) and highlighting disappears
         $('html').click(function () {
@@ -108,7 +105,9 @@ $(function() {
             };
         });
 
-        
+        if(!isNaN(where)){
+          var cursor = showCursor(where);
+        }
     };
 
     function showContentElement(index) {
