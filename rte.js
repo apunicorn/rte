@@ -1,5 +1,7 @@
 $(function() {
 
+    $('#editor1').focus();
+
     function newBox(element){
       var contents = [],
       cursorPos,
@@ -53,13 +55,13 @@ $(function() {
         var cursor = $('<span>|</span>');
         cursor.attr('id', 'cursor');
         cursor.css({
-          'color': 'red',
+          'color': '#00CCFF',
           'font-weight': 'bold'
         });
         var cursor2 = $('<span>|</span>');
         cursor2.attr('id', 'cursor');
         cursor2.css({
-          'color': 'red',
+          'color': '#00CCFF',
           'font-weight': 'bold'
         });
         if(arg == 'end'){
@@ -197,7 +199,7 @@ $(function() {
                                      var redId = selectionStart + ww;     
                                   }
                                  red = $('#'+ redId);
-                                 red.css('background-color', 'red'); 
+                                 red.css('background-color', '#99FF99'); 
                                  highlighted.push(red.selector.substring(1));
                               }
                               
@@ -238,7 +240,7 @@ $(function() {
                                cursor2 = $('<span>|</span>');
                                cursor2.attr('id', 'cursor2');
                                cursor2.css({
-                                   'color': 'red',
+                                   'color': '#00CCFF',
                                    'font-weight': 'bold'
                                });
                                letterSpan.before(cursor2);

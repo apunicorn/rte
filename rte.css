@@ -5,14 +5,17 @@ body{
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
 }
 
 
-#editor {
-	border: 2px solid #CACABC;
+#editor1 {
+	border: 2px solid #00FFFF;
 	padding: 20px;
-    width: 600px;
+    width: 800px;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 200px;
+    margin-top: 20px;
+    margin-bottom: 80px;
 }
