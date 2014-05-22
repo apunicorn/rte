@@ -208,13 +208,15 @@ $(function() {
                       });
 
                       function selectedAlter(newHi){
+                        var counter = 1;
                           //17: control, 66: b, 73: i, 82: r, 72:  h
                           var pressedStuff = {17: false, 66: false, 73: false, 82: false, 72: false};
                           element.off('keydown').keydown(function(ev){
                               for(var vv=0; vv<newHi.length; vv++){
                                   if(ev.keyCode == '8'){
-                                    var indexRemove = newHi[vv]-1;
+                                    var indexRemove = newHi[vv]-counter;
                                     contents.splice(indexRemove, 1); 
+                                    counter++;
                                   } else if(ev.keyCode in pressedStuff){
                                       pressedStuff[ev.keyCode] =true;
                                       if(pressedStuff[17] && pressedStuff[66]) {
@@ -265,5 +267,4 @@ $(function() {
     };
 
     newBox($('#editor1'));
-    newBox($('#editor2'));
  });
