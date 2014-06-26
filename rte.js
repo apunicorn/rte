@@ -1,7 +1,6 @@
 $(function() {
 
     $('#editor1').focus();
-
     function newBox(element){
       var contents = [],
       cursorPos,
@@ -80,6 +79,7 @@ $(function() {
           whereToPlace = editorKids[arg-1];
           //remember to wrap whereToPlace in $() since you're using it!!!!
           $(whereToPlace).before(cursor2);
+          console.log('set cursor2');
           return cursor2;
         }
       }
@@ -208,7 +208,7 @@ $(function() {
                               letterSpans.off('mousemove');
                           });
                       });
-
+                      
                       function selectedAlter(newHi){
                         var counter = 1;
                           //17: control, 66: b, 73: i, 82: r, 72:  h
@@ -249,11 +249,17 @@ $(function() {
                                    cursorBlink($('#cursor2'))
                                }, 300);
                                element.off('keydown').keydown(function(ev){
+                                console.log('starting over');
                                    var willRemove = Array.prototype.indexOf.call(element.children(), $("#cursor2")[0]);
+                                   console.log(willRemove);
+                                   console.log(cursorPos+' is the cursor position');
+                                   //this only runs once, but needs to run over and over:
+                                   //this needs to be a loop
                                    if(ev.keyCode == '8'){
                                        var indexToAdd = letterSpans[willRemove-2];
                                        contents.splice(willRemove-1, 1);
                                        cursorPos--;
+                                       console.log(cursorPos+' is the cursor position after');
                                        render(cursorPos);
                                        //need to make a var with the place that the cursor is at so i can reference that and keep it there
                              } else {
